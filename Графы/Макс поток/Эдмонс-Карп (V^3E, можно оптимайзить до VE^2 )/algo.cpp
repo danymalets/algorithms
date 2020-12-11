@@ -1,5 +1,3 @@
-/ford falkenson eto
-
 #include <iostream>
 #include <queue>
 using namespace std;
