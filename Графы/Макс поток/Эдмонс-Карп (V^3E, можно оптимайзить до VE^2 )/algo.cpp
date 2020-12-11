@@ -1,26 +1,28 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include <queue>
 using namespace std;
 
-const int INF=8e18;
-const int N=100;
+const int INF = 2e9;
+const int N = 1e3;
+const int M = 1e4;
 
 bool used[N];
-int n,m,source,sink,sz;
-int from[N];
-int capacity[N][N],flow[N][N];
+int n, m, source, target;
+int u[M], v[M], from[N];
+int capacity[N][N], flow[N][N];
 queue<int> q;
 
-bool find_way(int source,int sink){
+bool find_way(int source, int sink){
     memset(used,false,sizeof(used));
     q.push(source);
-    used[source]=true;
+    used[source] = true;
     while(!q.empty()){
         int v=q.front(); q.pop();
-        for (int to=0; to<n; to++){
-            if (!used[to]&&capacity[v][to]-flow[v][to]>0){
-                from[to]=v;
-                used[to]=true;
-                if (to==sink){
+        for (int to = 0; to < n; to++){
+            if (!used[to] && capacity[v][to] - flow[v][to] > 0){
+                from[to] = v;
+                used[to] = true;
+                if (to == sink){
                     while(!q.empty()) q.pop();
                     return true;
                 }
@@ -31,45 +33,39 @@ bool find_way(int source,int sink){
     return false;
 }
 
-long long find_max_flow(int source,int sinnk){
-    long long maxflow=0;
-    while(find_way(source,sink)){
-        int delta=INF;
-        for (int v=from[sink],to=sink; v>=0; to=v,v=from[v]){
-            delta=min(delta,capacity[v][to]-flow[v][to]);
+int find_max_flow(int source, int target){
+    int maxflow = 0;
+    while(find_way(source, target)){
+        int delta = INF;
+        for (int v = from[target], to = target; v >= 0; to = v, v = from[v]){
+            delta = min(delta, capacity[v][to] - flow[v][to]);
         }
-        for (int v=from[sink],to=sink; v>=0; to=v,v=from[v]){
-            flow[v][to]+=delta;
-            flow[to][v]-=delta;
+        for (int v = from[target], to = target; v >= 0; to = v, v = from[v]){
+            flow[v][to] += delta;
+            flow[to][v] -= delta;
         }
-        maxflow+=delta;
+        maxflow += delta;
     }
     return maxflow;
 }
 
 int main(){
-    freopen("input.txt","rt",stdin);
-    scanf("%d%d%d%d",&n,&m,&source,&sink);
-    source--; sink--;
-    from[source]=-1;
-    while(m--){
-        int x,y,c;
-        scanf("%d%d%d",&x,&y,&c);
-        x--; y--;
-        capacity[x][y]+=c;
+    ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    //freopen("input.txt", "rt", stdin);
+    //freopen("output.txt", "wt", stdout);
+    cin >> n >> m >> source >> target;
+    source--; target--;
+    from[source] = -1;
+    for (int i = 0; i < m; i++){
+        int w;
+        cin >> u[i] >> v[i] >> w;
+        u[i]--; v[i]--;
+        capacity[u[i]][v[i]] += w;
     }
 
-    printf("%I64d\n",find_max_flow(source,sink));
-    for (int v=0; v<n; v++){
-        for (int to=0; to<n; to++){
-            if (flow[v][to]>0) sz++;
-        }
-    }
-    printf("%d\n",sz);
-    for (int v=0; v<n; v++){
-        for (int to=0; to<n; to++){
-            if (flow[v][to]>0) printf("%d %d %d\n",v+1,to+1,flow[v][to]);
-        }
+    cout << find_max_flow(source, target) << '\n';
+    for (int i = 0; i < m; i++){
+        cout << max(0, flow[u[i]][v[i]]) << '\n';
     }
     return 0;
 }
